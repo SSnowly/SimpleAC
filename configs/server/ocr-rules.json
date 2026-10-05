@@ -1,0 +1,53 @@
+{
+  "version": "2026-10-04.1",
+  "minimumWordConfidence": 40,
+  "rules": [
+    {
+      "id": "executors",
+      "kind": "fuzzy",
+      "severity": "high",
+      "maxDistance": 1,
+      "terms": [
+        "eulen",
+        "redengine",
+        "red engine",
+        "lynx executor",
+        "hydrogen",
+        "skript gg",
+        "lua executor",
+        "cheat engine"
+      ]
+    },
+    {
+      "id": "cheat-menu-actions",
+      "kind": "term",
+      "severity": "medium",
+      "terms": [
+        "aimbot",
+        "triggerbot",
+        "silent aim",
+        "godmode",
+        "god mode",
+        "noclip",
+        "no clip",
+        "spawn weapon",
+        "give all weapons",
+        "infinite ammo",
+        "teleport to waypoint",
+        "inject lua"
+      ]
+    },
+    {
+      "id": "menu-combinations",
+      "kind": "phrase_all",
+      "severity": "high",
+      "phrases": ["godmode", "noclip"]
+    },
+    {
+      "id": "executor-ui",
+      "kind": "regex",
+      "severity": "medium",
+      "pattern": "\\b(execute|inject)\\b.{0,24}\\b(script|lua|resource)\\b"
+    }
+  ]
+}

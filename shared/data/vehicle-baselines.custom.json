@@ -1,0 +1,6 @@
+{
+  "version": 1,
+  "note": "Addon vehicles and handling overrides, merged over vehicle-baselines.json at load. Keys are lowercase model names and uppercase handling names. A handling entry may set only the fields it changes.",
+  "handlings": {},
+  "vehicles": {}
+}

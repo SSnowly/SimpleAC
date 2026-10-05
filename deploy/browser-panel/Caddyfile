@@ -1,0 +1,9 @@
+ac.example.com {
+  @panel path /simpleac/panel /simpleac/panel/*
+  handle @panel {
+    reverse_proxy 127.0.0.1:30120
+  }
+  handle {
+    respond "Not found" 404
+  }
+}

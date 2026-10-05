@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 600" fill="none" role="img" aria-labelledby="title desc">
+  <title id="title">SimpleAC</title>
+  <desc id="desc">White S and cyan A monogram with a transparent diagonal cut.</desc>
+  <defs>
+    <mask id="slash" maskUnits="userSpaceOnUse" x="0" y="0" width="1000" height="600">
+      <path fill="#fff" d="M0 0h1000v600H0z"/>
+      <path fill="#000" d="M20 475 965 15v24L20 499z"/>
+    </mask>
+  </defs>
+  <g mask="url(#slash)">
+    <path fill="#28cdff" fill-rule="evenodd" d="M572 65h119l246 470H795l-54-104H510l-42 104H339L572 65Zm59 153-67 134h135l-68-134Z" clip-rule="evenodd"/>
+    <path fill="#fff" d="M236 65h306l-69 123H246c-30 0-47 15-47 36 0 23 18 37 48 37h91c110 0 177 50 177 135 0 83-65 139-170 139H47l79-120h218c28 0 47-14 47-36 0-22-18-35-47-35h-94c-108 0-177-53-177-136C73 125 139 65 236 65Z"/>
+  </g>
+</svg>

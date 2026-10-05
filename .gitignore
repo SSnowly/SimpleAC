@@ -1,0 +1,28 @@
+node_modules/
+dist/
+coverage/
+.env
+*.log
+web/**/dist/
+
+# agent tooling
+.agents/
+.claude/
+CLAUDE.md
+AGENTS.md
+GEMINI.md
+.cursor/
+.codex/
+skills-lock.json
+plan.md
+FEATURES.txt
+docs/architecture/decisions/
+docs/developer/voice-monitoring-investigation.md
+research/
+notes/
+plans/
+**/*research*.md
+**/*investigation*.md
+
+# local screenshot evidence
+/evidence/

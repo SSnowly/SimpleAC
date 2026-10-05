@@ -1,0 +1,62 @@
+name: Release
+
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  package:
+    name: Build & package
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version-file: package.json
+      - run: bun install --frozen-lockfile
+      - run: bun scripts/check-publish.mjs HEAD
+      - name: Check release version
+        if: startsWith(github.ref, 'refs/tags/v')
+        env:
+          RELEASE_TAG: ${{ github.ref_name }}
+        run: bun scripts/check-release-version.mjs "$RELEASE_TAG"
+      - run: bun run build
+      - name: Assemble resource
+        run: |
+          mkdir -p package/SimpleAC
+          git archive HEAD bridge client configs locales server-lua shared fxmanifest.lua README.md CHANGELOG.md docs deploy | tar -x -C package/SimpleAC
+          cp -r dist package/SimpleAC/
+          cp dist/THIRD_PARTY_NOTICES.txt package/SimpleAC/
+          find package/SimpleAC/dist -name '*.map' -delete
+          (cd package && zip -qr ../SimpleAC-${{ github.ref_name }}.zip SimpleAC)
+          sha256sum SimpleAC-${{ github.ref_name }}.zip > SimpleAC-${{ github.ref_name }}.zip.sha256
+      - uses: actions/upload-artifact@v4
+        with:
+          name: SimpleAC-${{ github.ref_name }}
+          path: |
+            SimpleAC-${{ github.ref_name }}.zip
+            SimpleAC-${{ github.ref_name }}.zip.sha256
+      - name: Publish release
+        if: startsWith(github.ref, 'refs/tags/v')
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ github.ref_name }}
+        run: |
+          flags=(--verify-tag --title "SimpleAC $RELEASE_TAG")
+          if [[ "$RELEASE_TAG" == *-* ]]; then
+            flags+=(--prerelease --latest=false)
+          fi
+          if [[ -f "docs/releases/$RELEASE_TAG.md" ]]; then
+            flags+=(--notes-file "docs/releases/$RELEASE_TAG.md")
+          else
+            flags+=(--generate-notes)
+          fi
+          gh release create "$RELEASE_TAG" "SimpleAC-$RELEASE_TAG.zip" "SimpleAC-$RELEASE_TAG.zip.sha256" "${flags[@]}"

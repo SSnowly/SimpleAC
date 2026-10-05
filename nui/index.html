@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>SimpleAC</title>
+    <style>
+      html,
+      body {
+        margin: 0;
+        height: 100%;
+        background: transparent;
+        overflow: hidden;
+      }
+      #simpleac-panel {
+        display: none;
+        position: fixed;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        border: 0;
+        background: transparent;
+      }
+    </style>
+    <script src="devtools.js"></script>
+    <script src="fingerprint.js"></script>
+    <script src="capture.js"></script>
+    <script src="watch.js"></script>
+  </head>
+  <body>
+    <iframe id="simpleac-panel" title="SimpleAC panel" src="../web/nui/index.html" allowtransparency="true"></iframe>
+    <script src="panel.js"></script>
+  </body>
+</html>
