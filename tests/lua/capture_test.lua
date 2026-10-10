@@ -9,10 +9,7 @@ local function setup(sweepWait, players)
     clientEvents, localEvents, statements, convars = {}, {}, {}, {}
     local counter = 0
     MySQL = {
-        scalar = { await = function()
-            counter = counter + 1
-            return ('%064x'):format(counter)
-        end },
+        scalar = { await = function() return nil end },
         transaction = { await = function(queries)
             for _, query in ipairs(queries) do statements[#statements + 1] = query end
             return true
@@ -27,7 +24,14 @@ local function setup(sweepWait, players)
     GetInvokingResource = function() return 'simpleac' end
     GetPlayers = function() return players or {} end
     Wait = sweepWait or function() end
-    exports = function() end
+    exports = setmetatable({
+        simpleac = {
+            SecureRandomHex = function(_, bytes)
+                counter = counter + 1
+                return ('%0' .. bytes * 2 .. 'x'):format(counter)
+            end,
+        },
+    }, { __call = function() end })
     RegisterCommand = function() end
     package.loaded['server-lua.evidence.capture'] = nil
     local capture = require 'server-lua.evidence.capture'

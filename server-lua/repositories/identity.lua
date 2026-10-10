@@ -1,5 +1,6 @@
 local Actions = require 'server-lua.repositories.actions'
 local Id = require 'server-lua.id'
+local Random = require 'server-lua.random'
 local M = {}
 
 ---@class PlayerIdentifier
@@ -86,11 +87,13 @@ end
 
 ---@param installationId string
 function M.ensureInstallation(installationId)
+    local secret, salt = Random.hex(32), Random.hex(32)
+    if not secret or not salt then error('secure random source unavailable') end
     MySQL.insert.await([[
         INSERT INTO sac_server_installation (installation_id, secret_hash, identifier_salt)
-        SELECT ?, LOWER(SHA2(HEX(RANDOM_BYTES(32)), 256)), RANDOM_BYTES(32)
+        SELECT ?, LOWER(SHA2(?, 256)), UNHEX(?)
         WHERE NOT EXISTS (SELECT 1 FROM sac_server_installation)
-    ]], { installationId })
+    ]], { installationId, secret, salt })
 end
 
 ---@param source number

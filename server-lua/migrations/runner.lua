@@ -14,7 +14,13 @@ local M = {}
 ---@param migration { version: number, name: string, statements: string[] }
 local function applyMigration(migration)
     for index = 1, #migration.statements do
-        MySQL.query.await(migration.statements[index])
+        local statement = migration.statements[index]
+        if type(statement) == 'function' then
+            local query, values = statement()
+            MySQL.query.await(query, values)
+        else
+            MySQL.query.await(statement)
+        end
     end
 
     MySQL.insert.await(

@@ -1,12 +1,18 @@
+local Random = require 'server-lua.random'
+
 return {
     version = 2,
     name = 'identity_and_ledger',
     statements = {
         [[ALTER TABLE sac_server_installation
             ADD COLUMN IF NOT EXISTS identifier_salt VARBINARY(32) NULL AFTER secret_hash]],
-        [[UPDATE sac_server_installation
-            SET identifier_salt = RANDOM_BYTES(32)
-            WHERE identifier_salt IS NULL]],
+        function()
+            local salt = Random.hex(32)
+            if not salt then error('secure random source unavailable') end
+            return [[UPDATE sac_server_installation
+                SET identifier_salt = UNHEX(?)
+                WHERE identifier_salt IS NULL]], { salt }
+        end,
         [[ALTER TABLE sac_server_installation
             MODIFY COLUMN identifier_salt VARBINARY(32) NOT NULL]],
         [[ALTER TABLE sac_player_identifiers

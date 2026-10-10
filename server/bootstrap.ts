@@ -1,3 +1,4 @@
+import { randomBytes } from 'node:crypto';
 import { readFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
@@ -29,6 +30,12 @@ import { getHealth } from './services/health.js';
 import { createIdempotencyStore } from './services/idempotency.js';
 import { createOverviewService } from './services/overview.js';
 import { createProfileService } from './services/profiles.js';
+
+/** CSPRNG for the Lua side: MariaDB has no RANDOM_BYTES(), so secrets are generated here instead. */
+exports('SecureRandomHex', (bytes: unknown): string | null => {
+  const n = Number(bytes);
+  return Number.isInteger(n) && n > 0 && n <= 64 ? randomBytes(n).toString('hex') : null;
+});
 
 const db = createOxmysqlDatabase(exports.oxmysql);
 const keys = createApiKeyService(db);

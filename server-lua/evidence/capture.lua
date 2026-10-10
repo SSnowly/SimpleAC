@@ -1,6 +1,7 @@
 local Actions = require 'server-lua.repositories.actions'
 local Config = require 'configs.server.captures'
 local Id = require 'server-lua.id'
+local Random = require 'server-lua.random'
 local Logger = require 'server-lua.logger'
 local Sessions = require 'server-lua.services.sessions'
 local M = {}
@@ -49,7 +50,7 @@ local function send(options)
     if not session or GetPlayerName(source) == nil then return nil, 'player_offline' end
     if pendingCount() >= Config.maximumPending then return nil, 'busy' end
 
-    local token = MySQL.scalar.await('SELECT LOWER(HEX(RANDOM_BYTES(32)))')
+    local token = Random.hex(32)
     if type(token) ~= 'string' or #token ~= 64 then return nil, 'unavailable' end
 
     local captureId = Id.create('SAC-CAP')

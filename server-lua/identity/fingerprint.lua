@@ -1,6 +1,7 @@
 local Config = require 'configs.server.evasion'
 local Evasion = require 'server-lua.identity.evasion'
 local Id = require 'server-lua.id'
+local Random = require 'server-lua.random'
 local Logger = require 'server-lua.logger'
 local Sessions = require 'server-lua.services.sessions'
 local M = {}
@@ -149,7 +150,7 @@ local function resolveTokens(playerId, tokens)
 
     local issued
     if #known == 0 then
-        issued = MySQL.scalar.await('SELECT LOWER(HEX(RANDOM_BYTES(32)))')
+        issued = Random.hex(32)
         local hashed = type(issued) == 'string' and hashValues({ 'token:' .. issued }) or nil
         if not hashed then return known, nil end
         MySQL.insert.await('INSERT IGNORE INTO sac_device_tokens (token_hash) VALUES (?)', { hashed[1] })

@@ -16,6 +16,7 @@ declare function RegisterCommand(
 ): void;
 
 declare const exports: {
+  (name: string, handler: (...args: any[]) => unknown): void;
   [resourceName: string]: unknown;
   oxmysql: {
     query_async(query: string, values?: unknown[]): Promise<unknown>;
