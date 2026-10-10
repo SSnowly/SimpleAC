@@ -346,6 +346,7 @@ describe('panel handlers', () => {
         return Promise.resolve(true);
       },
       kick: () => Promise.resolve(true),
+      cleanup: () => Promise.resolve({ entities: 0, revived: 0 }),
     },
     captures: undefined,
     serverInfo: () => ({

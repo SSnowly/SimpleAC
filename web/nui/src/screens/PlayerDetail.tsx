@@ -39,6 +39,7 @@ type Tab = (typeof TABS)[number];
 const ACTIONS = [
   'player.action_warn',
   'player.action_kick',
+  'player.action_cleanup',
   'player.action_temporary',
   'player.action_permanent',
 ] as const;
@@ -402,6 +403,12 @@ function PlayerActions({
               toast(
                 t('player.kick_recorded'),
                 result.dropped ? t('player.kick_removed') : t('player.kick_offline'),
+              );
+            } else if (choice === 'player.action_cleanup') {
+              const result = await rpc('moderation.cleanup', { playerId, reason });
+              toast(
+                t('player.cleanup_recorded'),
+                t('player.cleanup_result', result.entities, result.revived),
               );
             } else {
               await rpc('moderation.ban', {

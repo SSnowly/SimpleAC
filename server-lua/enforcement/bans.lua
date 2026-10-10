@@ -1,3 +1,4 @@
+local Cleanup = require 'server-lua.enforcement.cleanup'
 local DryRun = require 'server-lua.enforcement.dry_run'
 local Sessions = require 'server-lua.services.sessions'
 local M = {}
@@ -19,6 +20,7 @@ function M.start()
             return false
         end
 
+        Cleanup.automatic(source)
         DropPlayer(source, locale('kick.banned', banId))
         return true
     end)

@@ -116,6 +116,7 @@ interface PanelExports {
   InternalPanelPlayer?: (source: number) => unknown;
   InternalPanelWarn?: (playerId: string, reason: string) => unknown;
   InternalPanelKick?: (playerId: string, reason: string) => unknown;
+  InternalPanelCleanup?: (playerId: string) => unknown;
 }
 
 const panelExports = (): PanelExports => {
@@ -158,5 +159,16 @@ export function createPanelGame(): PanelGame & {
       onGameThread(() => panelExports().InternalPanelWarn?.(playerId, reason) === true),
     kick: (playerId, reason) =>
       onGameThread(() => panelExports().InternalPanelKick?.(playerId, reason) === true),
+    cleanup: (playerId) =>
+      onGameThread(() => {
+        const value = panelExports().InternalPanelCleanup?.(playerId) as
+          | { entities?: unknown; revived?: unknown }
+          | null
+          | undefined;
+        return {
+          entities: typeof value?.entities === 'number' ? value.entities : 0,
+          revived: typeof value?.revived === 'number' ? value.revived : 0,
+        };
+      }),
   };
 }

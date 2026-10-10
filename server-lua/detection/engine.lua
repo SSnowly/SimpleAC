@@ -1,6 +1,7 @@
 local Actions = require 'server-lua.repositories.actions'
 local Allowances = require 'server-lua.detection.allowances'
 local Capture = require 'server-lua.evidence.capture'
+local Cleanup = require 'server-lua.enforcement.cleanup'
 local Context = require 'server-lua.detection.context'
 local DryRun = require 'server-lua.enforcement.dry_run'
 local Exceptions = require 'server-lua.detection.exceptions'
@@ -349,6 +350,7 @@ local function persist(decision)
     elseif (decision.outcome == 'kick'
         or decision.outcome == 'temporary_ban'
         or decision.outcome == 'permanent_ban') and source then
+        if not DryRun.active() then Cleanup.automatic(source) end
         DropPlayer(source, locale('kick.detection', decision.rule.key, decision.detectionId))
     end
 end

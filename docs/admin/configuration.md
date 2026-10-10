@@ -74,3 +74,7 @@ With `sweep.enabled`, the server captures players on a rotation and reads the te
 | `simpleac:watch_relay_ports` (49152–49351) | UDP | Live-watch video |
 
 Use an HTTPS reverse proxy for browser and API traffic; see the [HTTP API](../developer/http-api.md).
+
+## Player cleanup
+
+`configs/server/cleanup.lua` controls the cleanup action. Cleaning up a player deletes the script-created vehicles, peds and objects they own (the game's own population, other players and occupied vehicles are skipped) and revives players they killed within `victimWindowSeconds`, using `reviveEvent`. Staff run it from **Player → Actions → Clean up**. With `automatic.enabled`, it also runs right before a detection kicks or bans a player (not in debug mode). Kills are learned from the `baseevents:onPlayerKilled` event, so `baseevents` must be running.

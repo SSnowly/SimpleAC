@@ -1,7 +1,7 @@
 return {
     entity = {
         windowMs = 10000,
-        perPlayerLimit = 40,
+        perPlayerLimit = 12,
         globalLimit = 180,
         deniedModels = {},
         -- ePopulationType values the game spawns on its own (random permanent/parked/patrol/scenario/

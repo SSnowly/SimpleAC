@@ -35,6 +35,7 @@ export interface PanelGame {
   online(): Promise<OnlinePlayer[]>;
   warn(playerId: string, reason: string): Promise<boolean>;
   kick(playerId: string, reason: string): Promise<boolean>;
+  cleanup(playerId: string): Promise<{ entities: number; revived: number }>;
 }
 
 export interface PanelDeps {
@@ -359,6 +360,14 @@ export function createPanelHandlers(deps: PanelDeps): PanelHandlers {
         throw notFound('The player does not exist.');
       await ledger(context, 'moderation.kicked', 'player', input.playerId, input.reason, {});
       return { ok: true, dropped: await game.kick(input.playerId, input.reason) };
+    },
+
+    async 'moderation.cleanup'(context, input) {
+      if (!(await directory.getPlayer(input.playerId, false)))
+        throw notFound('The player does not exist.');
+      const result = await game.cleanup(input.playerId);
+      await ledger(context, 'moderation.cleaned', 'player', input.playerId, input.reason, result);
+      return { ok: true, ...result };
     },
 
     'moderation.ban': (context, input) =>

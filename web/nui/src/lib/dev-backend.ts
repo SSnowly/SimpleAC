@@ -273,6 +273,8 @@ function answer(op: PanelOp): unknown {
       return { ok: true, delivered: true };
     case 'moderation.kick':
       return { ok: true, dropped: true };
+    case 'moderation.cleanup':
+      return { ok: true, entities: 3, revived: 1 };
     case 'moderation.ban':
     case 'moderation.unban':
       return ban;

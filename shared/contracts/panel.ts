@@ -170,6 +170,10 @@ export const panelOps = {
     permission: 'players.moderate',
     input: z.object({ playerId: simpleAcIdSchema, reason }),
   },
+  'moderation.cleanup': {
+    permission: 'players.moderate',
+    input: z.object({ playerId: simpleAcIdSchema, reason }),
+  },
   'moderation.ban': {
     permission: 'players.moderate',
     input: z.object({
@@ -364,6 +368,7 @@ export interface PanelOpOutput {
   'bans.list': PanelPage<Ban>;
   'moderation.warn': { ok: true; delivered: boolean };
   'moderation.kick': { ok: true; dropped: boolean };
+  'moderation.cleanup': { ok: true; entities: number; revived: number };
   'moderation.ban': Ban;
   'moderation.unban': Ban;
   'exceptions.list': PanelPage<ExceptionRecord>;
