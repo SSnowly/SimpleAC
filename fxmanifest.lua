@@ -3,7 +3,7 @@ game 'gta5'
 
 author 'SimpleAC contributors'
 description 'Self-hostable FiveM anti-cheat and operations platform'
-version '0.1.0-beta.1'
+version '1.0.0'
 
 lua54 'yes'
 -- Node 22 (bundled with the server) for the control plane: workers for OCR, global fetch and current language features.

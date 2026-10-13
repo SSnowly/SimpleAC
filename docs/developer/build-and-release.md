@@ -33,9 +33,9 @@ Always deploy `dist/` after a build; the resource does not run from `nui/`.
 
 - `.github/workflows/ci.yml` checks publishable files, formatting, types, tests, and the build on pushes to `main` and pull requests.
 - `.github/workflows/release.yml` builds on `v*` tags or manual runs. It packages the runtime, tracked documentation, deployment examples, and dependency notices into `SimpleAC/`, removes source maps, and generates a ZIP and SHA-256 checksum.
-- A tag containing a prerelease suffix, such as `v0.1.0-beta.1`, creates a GitHub prerelease. Release notes come from `docs/releases/<tag>.md` when present, otherwise from GitHub's generated notes.
+- A tag containing a prerelease suffix, such as `v1.1.0-beta.1`, creates a GitHub prerelease. Release notes come from `docs/releases/<tag>.md` when present, otherwise from GitHub's generated notes.
 
-## Publish a beta
+## Publish a release
 
 1. Set the same version in `package.json`, `fxmanifest.lua`, and `configs/shared/main.lua`.
 2. Update `CHANGELOG.md` and add `docs/releases/v<version>.md`.
@@ -43,8 +43,8 @@ Always deploy `dist/` after a build; the resource does not run from `nui/`.
 4. Commit and push the release changes. Tag that commit and push the tag:
 
    ```sh
-   git tag -a v0.1.0-beta.1 -m "SimpleAC 0.1.0-beta.1"
-   git push origin v0.1.0-beta.1
+   git tag -a v1.0.0 -m "SimpleAC 1.0.0"
+   git push origin v1.0.0
    ```
 
 5. Check the Release workflow and confirm the GitHub release is marked **Pre-release** with both assets attached.

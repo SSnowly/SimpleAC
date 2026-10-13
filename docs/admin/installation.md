@@ -2,14 +2,14 @@
 
 ## Install the beta
 
-1. Download the `SimpleAC-v0.1.0-beta.1.zip` asset from [GitHub Releases](https://github.com/SSnowly/SimpleAC/releases). Use the release asset; GitHub's source archives contain uncompiled source.
+1. Download the `SimpleAC-v1.0.0.zip` asset from [GitHub Releases](https://github.com/SSnowly/SimpleAC/releases). Use the release asset; GitHub's source archives contain uncompiled source.
 2. Extract `SimpleAC/` into your server's resources directory. Keep that folder name, or use your chosen name in commands, worker permissions, and HTTP paths.
 3. Install `ox_lib` and `oxmysql`, configure the database connection, and enable OneSync.
 4. Add the settings and start order from the [README](../../README.md#installation) to `server.cfg`. SimpleAC selects the bundled Node.js 22 runtime through its manifest.
 5. Review `configs/server/profile.lua` and the [configuration reference](configuration.md). For live watch, set the server's public IP and open its UDP ports.
 6. Start the server. SimpleAC applies pending database migrations automatically. Run `simpleac:diagnostics` in the server console, then open the staff panel with F10 or `/simpleac`.
 
-The ZIP includes documentation and third-party license notices. `SimpleAC-v0.1.0-beta.1.zip.sha256` contains the ZIP's SHA-256 checksum.
+The ZIP includes documentation and third-party license notices. `SimpleAC-v1.0.0.zip.sha256` contains the ZIP's SHA-256 checksum.
 
 ## Update
 

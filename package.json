@@ -1,6 +1,6 @@
 {
   "name": "simpleac",
-  "version": "0.1.0-beta.1",
+  "version": "1.0.0",
   "private": true,
   "description": "Self-hostable FiveM anti-cheat and operations platform",
   "scripts": {

@@ -1,5 +1,18 @@
 # Changelog
 
+## 1.0.0
+
+First stable release for FiveM Legacy.
+
+- Automatic install of `init.lua` into every resource manifest, with a one-time restart requirement.
+- MariaDB support, including 16.1.
+- Permit system that catches unauthorized vehicle and explosion spawns, with a trusted resource whitelist.
+- Server-side movement speed check.
+- Player cleanup: deletes spawned entities and revives victims, automatically before a kick or ban.
+- Weapon baseline generated from `weapons.meta`, with automatic scanning of custom weapons in other resources and server overrides.
+- Cancelled damage now restores the victim's health on the attacker's client.
+- Unauthorized vehicles and explosions, server speed hacks and NUI devtools are permanent bans by default.
+
 ## 0.1.0-beta.1
 
 First beta release for FiveM Legacy.
