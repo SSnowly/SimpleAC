@@ -7,7 +7,8 @@
       "!**/dist",
       "!**/coverage",
       "!**/bun.lock",
-      "!shared/data/vehicle-baselines.json"
+      "!shared/data/vehicle-baselines.json",
+      "!shared/data/weapon-baselines.json"
     ]
   },
   "formatter": { "enabled": true, "indentStyle": "space", "indentWidth": 2, "lineWidth": 100 },
