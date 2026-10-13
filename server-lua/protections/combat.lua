@@ -3,6 +3,7 @@ local Config = require 'configs.server.combat'
 local DryRun = require 'server-lua.enforcement.dry_run'
 local Engine = require 'server-lua.detection.engine'
 local Inventory = require 'bridge.weapon_inventory'
+local Baseline = require 'server-lua.weapons.baseline'
 local M = {}
 
 ---@type table<number, table<number, { value: boolean?, expiresAt: number }>>
@@ -21,6 +22,42 @@ local function weaponDefinition(weaponHash)
         configured.ammoItem = discovered.ammoItem
     end
     return configured or discovered
+end
+
+---Damage and range limits: the server's explicit config wins, otherwise they come from the weapon baseline
+---(game files, then weapon meta found in other resources, then the server's own overrides).
+---@param weaponHash number
+---@return { maxDamage: number?, headshotMultiplier: number, maxDistance: number? }
+local function weaponLimits(weaponHash)
+    local configured = Config.weapons[weaponHash] or {}
+    local found = Baseline.find(weaponHash)
+    local derived = found and Baseline.limits(found.entry, Config)
+        or { headshotMultiplier = Config.headshotMultiplier }
+    return {
+        maxDamage = configured.maxDamage or derived.maxDamage,
+        headshotMultiplier = derived.headshotMultiplier,
+        maxDistance = configured.maxDistance or derived.maxDistance,
+    }
+end
+
+---Cancels a damage event and tells the attacker's client what the victim's health really is. Without this the
+---attacker's game has already applied the hit locally (a kill on their screen) while everyone else sees no damage.
+---@param attacker number
+---@param data table
+local function reject(attacker, data)
+    CancelEvent()
+    local netId = data.hitGlobalId
+    if type(netId) ~= 'number' or netId <= 0 then return end
+    local victim = NetworkGetEntityFromNetworkId(netId)
+    if victim == 0 or not DoesEntityExist(victim) or GetEntityType(victim) ~= 1 then return end
+
+    local function push()
+        if GetPlayerName(attacker) == nil or not DoesEntityExist(victim) then return end
+        TriggerClientEvent('simpleac:combat:restore', attacker, netId, GetEntityHealth(victim), GetPedArmour(victim))
+    end
+    push()
+    -- The attacker's own damage can land after the first correction, so assert it again.
+    SetTimeout(Config.restoreDelayMs, push)
 end
 
 ---@param source number
@@ -100,6 +137,8 @@ local function validateLoadout(source, weaponHash, ammo, components)
 end
 
 function M.start()
+    Baseline.start()
+
     RegisterNetEvent('simpleac:combat:equipped', function(weaponHash, ammo, components)
         local playerSource = source
         if type(weaponHash) ~= 'number' or GetPlayerName(playerSource) == nil then return end
@@ -131,7 +170,7 @@ function M.start()
         if not playerSource or GetPlayerName(playerSource) == nil or type(data) ~= 'table'
             or type(data.weaponType) ~= 'number' then return end
         local weaponHash = data.weaponType
-        if validateWeapon(playerSource, weaponHash, 'damage') and not DryRun.active() then CancelEvent() return end
+        if validateWeapon(playerSource, weaponHash, 'damage') and not DryRun.active() then reject(playerSource, data) return end
 
         local attackerPed = GetPlayerPed(playerSource)
         if attackerPed ~= 0 then
@@ -161,32 +200,32 @@ function M.start()
 
         if Config.invalidPlayerDamageWeapons[weaponHash] then
             local decision = submit(playerSource, 'combat.damage_type_invalid', { weapon = weaponHash })
-            if decision.cancel then CancelEvent() end
+            if decision.cancel then reject(playerSource, data) end
             return
         end
 
-        local definition = weaponDefinition(weaponHash)
-        if not definition or Allowances.isAllowed(playerSource, 'combat.damage', nil) then return end
-        local damageLimit = definition.maxDamage
-            and definition.maxDamage * (Config.headshotComponents[data.hitComponent] and Config.headshotMultiplier or 1)
+        if Allowances.isAllowed(playerSource, 'combat.damage', nil) then return end
+        local limits = weaponLimits(weaponHash)
+        local damageLimit = limits.maxDamage
+            and limits.maxDamage * (Config.headshotComponents[data.hitComponent] and limits.headshotMultiplier or 1)
         if damageLimit and data.overrideDefaultDamage == true and type(data.weaponDamage) == 'number'
             and data.weaponDamage > damageLimit + Config.damageTolerance then
             local decision = submit(playerSource, 'combat.damage_excessive', {
                 weapon = weaponHash, damage = data.weaponDamage, maximum = damageLimit, hitComponent = data.hitComponent,
             })
-            if decision.cancel then CancelEvent() end
+            if decision.cancel then reject(playerSource, data) return end
         end
 
-        if definition.maxDistance and type(data.hitGlobalId) == 'number' and data.hitGlobalId > 0 then
+        if limits.maxDistance and type(data.hitGlobalId) == 'number' and data.hitGlobalId > 0 then
             local victim = NetworkGetEntityFromNetworkId(data.hitGlobalId)
             local attacker = attackerPed
             if victim ~= 0 and attacker ~= 0 and DoesEntityExist(victim) and DoesEntityExist(attacker) then
                 local distance = #(GetEntityCoords(attacker) - GetEntityCoords(victim))
-                if distance > definition.maxDistance + Config.distanceTolerance then
+                if distance > limits.maxDistance + Config.distanceTolerance then
                     local decision = submit(playerSource, 'combat.damage_distance', {
-                        weapon = weaponHash, distance = distance, maximum = definition.maxDistance,
+                        weapon = weaponHash, distance = distance, maximum = limits.maxDistance,
                     })
-                    if decision.cancel then CancelEvent() end
+                    if decision.cancel then reject(playerSource, data) end
                 end
             end
         end

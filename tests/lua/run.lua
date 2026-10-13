@@ -27,7 +27,7 @@ end
 
 package.loaded['tests.lua.framework'] = T
 
-for _, file in ipairs({ 'rules', 'engine', 'grace', 'client_reports', 'vehicle', 'network', 'client_runtime', 'fingerprint', 'capture' }) do
+for _, file in ipairs({ 'rules', 'engine', 'grace', 'client_reports', 'vehicle', 'network', 'client_runtime', 'fingerprint', 'capture', 'weapons' }) do
     dofile(('tests/lua/%s_test.lua'):format(file))
 end
 

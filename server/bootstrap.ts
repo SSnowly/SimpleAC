@@ -16,6 +16,7 @@ import {
   createGameBridge,
   createPanelGame,
 } from './game/bridge.js';
+import { scanWeaponMeta } from './game/weapon-meta.js';
 import { createHttpApp, type HttpAppDeps } from './http/app.js';
 import { loadWebConfig } from './panel/web-auth.js';
 import { registerPanel } from './panel/wire.js';
@@ -35,6 +36,18 @@ import { createProfileService } from './services/profiles.js';
 exports('SecureRandomHex', (bytes: unknown): string | null => {
   const n = Number(bytes);
   return Number.isInteger(n) && n > 0 && n <= 64 ? randomBytes(n).toString('hex') : null;
+});
+
+/** Weapons defined by other resources' meta files, so the Lua side knows their real damage and range. */
+exports('ScanWeaponMeta', (): Record<string, unknown> => {
+  const self = GetCurrentResourceName();
+  const resources: { name: string; path: string }[] = [];
+  for (let index = 0; index < GetNumResources(); index += 1) {
+    const name = GetResourceByFindIndex(index);
+    if (name && name !== self) resources.push({ name, path: GetResourcePath(name) });
+  }
+  resources.sort((a, b) => a.name.localeCompare(b.name));
+  return scanWeaponMeta(resources);
 });
 
 const db = createOxmysqlDatabase(exports.oxmysql);

@@ -1,6 +1,8 @@
 declare function GetCurrentResourceName(): string;
 declare function GetResourceState(resourceName: string): string;
 declare function GetResourcePath(resourceName: string): string;
+declare function GetNumResources(): number;
+declare function GetResourceByFindIndex(index: number): string | undefined;
 declare function GetConvar(name: string, defaultValue: string): string;
 declare function emit(eventName: string, ...args: unknown[]): void;
 declare function GetResourceMetadata(

@@ -1,16 +1,15 @@
+-- Damage and range come from the weapon baseline (shared/data/weapon-baselines*.json plus weapons.meta files found in
+-- other resources). Entries here name the inventory item, the blacklist and, optionally, a hard
+-- `maxDamage` / `maxDistance` that overrides the derived limit.
 local definitions = {
-    { 'WEAPON_UNARMED', 40, 3.5 }, { 'WEAPON_PISTOL', 80, 180.0 },
-    { 'WEAPON_COMBATPISTOL', 80, 180.0 }, { 'WEAPON_APPISTOL', 75, 160.0 },
-    { 'WEAPON_SMG', 70, 220.0 }, { 'WEAPON_ASSAULTRIFLE', 100, 350.0 },
-    { 'WEAPON_CARBINERIFLE', 100, 350.0 }, { 'WEAPON_PUMPSHOTGUN', 240, 90.0 },
-    { 'WEAPON_SNIPERRIFLE', 250, 1000.0 }, { 'WEAPON_HEAVYSNIPER', 300, 1400.0 },
-    { 'WEAPON_RPG', 1000, 1200.0, true }, { 'WEAPON_MINIGUN', 100, 500.0, true },
-    { 'WEAPON_RAILGUN', 1000, 1200.0, true },
+    { 'WEAPON_UNARMED' }, { 'WEAPON_PISTOL' }, { 'WEAPON_COMBATPISTOL' }, { 'WEAPON_APPISTOL' }, { 'WEAPON_SMG' },
+    { 'WEAPON_ASSAULTRIFLE' }, { 'WEAPON_CARBINERIFLE' }, { 'WEAPON_PUMPSHOTGUN' }, { 'WEAPON_SNIPERRIFLE' },
+    { 'WEAPON_HEAVYSNIPER' }, { 'WEAPON_RPG', true }, { 'WEAPON_MINIGUN', true }, { 'WEAPON_RAILGUN', true },
 }
 local weapons = {}
 for _, definition in ipairs(definitions) do
     weapons[GetHashKey(definition[1])] = {
-        item = definition[1], maxDamage = definition[2], maxDistance = definition[3], blacklisted = definition[4],
+        item = definition[1], blacklisted = definition[2],
     }
 end
 
@@ -19,6 +18,13 @@ return {
     ownershipCacheMs = 750,
     distanceTolerance = 15.0,
     damageTolerance = 5,
+    -- Used for weapons whose meta does not define a headshot modifier.
+    headshotMultiplier = 5,
+    headshotComponents = { [20] = true, [21] = true },
+    -- A hit is allowed up to this multiple of the weapon's meta Range (bullets keep travelling past it).
+    rangeMultiplier = 2.0,
+    -- Wait before telling the attacker's client the victim's real health a second time.
+    restoreDelayMs = 250,
     ammoTolerance = 2,
     shotCorrelationMs = 1750,
     maximumDamageEventsPerSecond = 24,

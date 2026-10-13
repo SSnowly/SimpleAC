@@ -4,6 +4,10 @@ SimpleAC is a FiveM anti-cheat resource with server protections, client detectio
 
 The current release is **0.1.0-beta.1**, for FiveM Legacy. Report bugs and false positives through [GitHub issues](https://github.com/SSnowly/SimpleAC/issues).
 
+## AI notice
+
+Parts of SimpleAC were written with the help of an AI coding assistant. The assistant was directed and steered by a real developer, who decides what gets built and how. Every line of code was reviewed by a person, and nothing reaches users without that review.
+
 ## Installation
 
 Download `SimpleAC-v0.1.0-beta.1.zip` from [Releases](https://github.com/SSnowly/SimpleAC/releases) and extract the `SimpleAC` folder into your server's resources directory. The release ZIP includes the compiled UI, server code, and OCR files.

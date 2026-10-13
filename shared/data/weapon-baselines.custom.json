@@ -1,0 +1,5 @@
+{
+  "version": 1,
+  "note": "Server weapon overrides, merged over weapon-baselines.json and over weapons found in other resources' meta files. Keys are lowercase weapon names (weapon_pistol). An entry may set only the fields it changes, using the weapons.meta field names (Damage, WeaponRange, Speed, HeadShotDamageModifierPlayer, ...).",
+  "weapons": {}
+}

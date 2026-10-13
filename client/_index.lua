@@ -1,6 +1,7 @@
 local Config = require 'configs.shared.main'
 require 'client.scheduler'
 require 'client.detection.sensors'
+require 'client.combat'
 require 'client.integrity.heartbeat'
 require 'client.detection.nui_devtools'
 require 'client.identity.fingerprint'
