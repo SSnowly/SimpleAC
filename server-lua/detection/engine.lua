@@ -122,6 +122,12 @@ local function updateStrikes(source, rule)
     return state.count
 end
 
+---@param mode string
+---@return boolean
+local function cancelsEvent(mode)
+    return mode == 'cancel' or mode == 'temporary_ban' or mode == 'permanent_ban'
+end
+
 ---@param cumulativeRisk number
 ---@param mode string
 ---@return string
@@ -183,7 +189,7 @@ function M.evaluate(signal)
     cooldowns[signal.source] = cooldowns[signal.source] or {}
     local lastAccepted = cooldowns[signal.source][rule.key] or -rule.cooldownMs
     if now - lastAccepted < rule.cooldownMs then
-        return { accepted = false, reason = 'cooldown', cancel = policy.mode == 'cancel' and rule.cancellable and not DryRun.active() }
+        return { accepted = false, reason = 'cooldown', cancel = cancelsEvent(policy.mode) and rule.cancellable and not DryRun.active() }
     end
     cooldowns[signal.source][rule.key] = now
 
@@ -196,7 +202,7 @@ function M.evaluate(signal)
     -- A profile entry's announce overrides the rule's own default, so any rule can be printed from config.
     local announce = policy.announce
     if announce == nil then announce = rule.announce end
-    local cancel = policy.mode == 'cancel' and rule.cancellable and confidence >= policy.minimumConfidence
+    local cancel = cancelsEvent(policy.mode) and rule.cancellable and confidence >= policy.minimumConfidence
     local wouldHave
     if DryRun.active() then
         -- Debug mode never acts: keep the decision for the console and the database, drop the enforcement.

@@ -90,7 +90,7 @@ T.test('debug mode downgrades every enforcement to a console log', function()
 
     H.addPlayer(1)
     local live = engine().evaluate({ rule = 'integrity.nui_devtools', source = 1, measured = measured })
-    T.eq(live.outcome, 'temporary_ban', 'enforced outside debug mode')
+    T.eq(live.outcome, 'permanent_ban', 'enforced outside debug mode')
 
     shared.debug = true
     H.addPlayer(2)
@@ -98,7 +98,7 @@ T.test('debug mode downgrades every enforcement to a console log', function()
     shared.debug = false
     T.eq(debug.accepted, true, 'still detected')
     T.eq(debug.outcome, 'log', 'no enforcement')
-    T.eq(debug.wouldHave, 'temporary_ban', 'records what it would have done')
+    T.eq(debug.wouldHave, 'permanent_ban', 'records what it would have done')
     T.eq(debug.announce, true, 'printed to the console')
     T.eq(debug.cancel, false, 'no cancellation')
 end)

@@ -167,10 +167,12 @@ function M.start()
 
         local definition = weaponDefinition(weaponHash)
         if not definition or Allowances.isAllowed(playerSource, 'combat.damage', nil) then return end
-        if definition.maxDamage and data.overrideDefaultDamage == true and type(data.weaponDamage) == 'number'
-            and data.weaponDamage > definition.maxDamage + Config.damageTolerance then
+        local damageLimit = definition.maxDamage
+            and definition.maxDamage * (Config.headshotComponents[data.hitComponent] and Config.headshotMultiplier or 1)
+        if damageLimit and data.overrideDefaultDamage == true and type(data.weaponDamage) == 'number'
+            and data.weaponDamage > damageLimit + Config.damageTolerance then
             local decision = submit(playerSource, 'combat.damage_excessive', {
-                weapon = weaponHash, damage = data.weaponDamage, maximum = definition.maxDamage,
+                weapon = weaponHash, damage = data.weaponDamage, maximum = damageLimit, hitComponent = data.hitComponent,
             })
             if decision.cancel then CancelEvent() end
         end

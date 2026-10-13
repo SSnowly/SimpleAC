@@ -1,5 +1,7 @@
 local Config = require 'configs.server.protections'
 local Engine = require 'server-lua.detection.engine'
+local Permits = require 'server-lua.protections.permits'
+local PermitConfig = require 'configs.server.permits'
 local M = {}
 
 ---@class RateWindow
@@ -43,12 +45,29 @@ local function incrementGlobalEntityRate(windowMs)
     return globalEntityRate.count
 end
 
+---@param entity number
+---@param owner number
+local function checkVehiclePermit(entity, owner)
+    if Permits.consume(owner, 'vehicle') then return end
+
+    local model = GetEntityModel(entity)
+    CreateThread(function()
+        Wait(PermitConfig.graceMs.vehicle)
+        if Permits.consume(owner, 'vehicle') then return end
+        if DoesEntityExist(entity) and PermitConfig.trustedCreators[GetEntityScript(entity) or ''] then return end
+        Permits.violation(owner, 'network.vehicle_unauthorized', { model = model })
+        if PermitConfig.enforce and DoesEntityExist(entity) then DeleteEntity(entity) end
+    end)
+end
+
 local function handleEntityCreating(entity)
     if type(entity) ~= 'number' or entity <= 0 then return end
     local owner = NetworkGetEntityOwner(entity)
     if type(owner) ~= 'number' or owner <= 0 or GetPlayerName(owner) == nil then return end
 
     if Config.entity.ignoredPopulationTypes[GetEntityPopulationType(entity)] then return end
+
+    if GetEntityType(entity) == 2 then checkVehiclePermit(entity, owner) end
 
     local model = GetEntityModel(entity)
     local playerCount = incrementRate(entityRates, owner, Config.entity.windowMs)
@@ -80,13 +99,46 @@ local function handleEntityCreating(entity)
     if decision and decision.cancel then CancelEvent() end
 end
 
+---A vehicle blowing up raises its own explosion; accept those only with a vehicle at the blast.
+---@param event table<string, any>
+---@return boolean
+local function isNaturalExplosion(event)
+    if PermitConfig.naturalExplosionTypes[tonumber(event.explosionType) or -1] ~= true then return false end
+    local x, y, z = tonumber(event.posX), tonumber(event.posY), tonumber(event.posZ)
+    if not (x and y and z) then return false end
+
+    local radius = PermitConfig.naturalExplosionRadius
+    for _, vehicle in ipairs(GetAllVehicles()) do
+        local position = GetEntityCoords(vehicle)
+        local dx, dy, dz = position.x - x, position.y - y, position.z - z
+        if dx * dx + dy * dy + dz * dz <= radius * radius then return true end
+    end
+    return false
+end
+
 ---@param sender number
 ---@param event table<string, any>
 local function handleExplosion(sender, event)
     if type(sender) ~= 'number' or sender <= 0 or GetPlayerName(sender) == nil or type(event) ~= 'table' then return end
 
-    local count = incrementRate(explosionRates, sender, Config.explosion.windowMs)
     local explosionType = tonumber(event.explosionType) or -1
+    if not isNaturalExplosion(event) and not Permits.consume(sender, 'explosion') then
+        CancelEvent()
+        local measured = {
+            explosionType = explosionType,
+            damageScale = tonumber(event.damageScale) or 0,
+            audible = event.isAudible == true,
+            invisible = event.isInvisible == true,
+        }
+        CreateThread(function()
+            Wait(PermitConfig.graceMs.explosion)
+            if Permits.consume(sender, 'explosion') then return end
+            Permits.violation(sender, 'network.explosion_unauthorized', measured)
+        end)
+        return
+    end
+
+    local count = incrementRate(explosionRates, sender, Config.explosion.windowMs)
     local damageScale = tonumber(event.damageScale) or 0
     local abnormal = Config.explosion.deniedTypes[explosionType] == true
         or event.isInvisible == true

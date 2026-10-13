@@ -33,6 +33,7 @@ client_scripts {
 }
 
 files {
+    'init.lua',
     'configs/shared/*.lua',
     'configs/client/*.lua',
     'shared/lua/*.lua',

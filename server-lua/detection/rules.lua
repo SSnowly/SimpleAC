@@ -71,6 +71,36 @@ Registry.register({
 })
 
 Registry.register({
+    key = 'network.vehicle_unauthorized',
+    category = 'network',
+    version = 1,
+    defaultSeverity = 100,
+    defaultConfidence = 1.0,
+    cooldownMs = 0,
+    strikeWindowMs = 60000,
+    strikeDecayMs = 20000,
+    cancellable = true,
+    validate = function(measured)
+        return type(measured.model) == 'number'
+    end,
+})
+
+Registry.register({
+    key = 'network.explosion_unauthorized',
+    category = 'network',
+    version = 1,
+    defaultSeverity = 100,
+    defaultConfidence = 1.0,
+    cooldownMs = 0,
+    strikeWindowMs = 60000,
+    strikeDecayMs = 20000,
+    cancellable = true,
+    validate = function(measured)
+        return type(measured.explosionType) == 'number'
+    end,
+})
+
+Registry.register({
     key = 'network.explosion_rate',
     category = 'network',
     version = 1,
@@ -304,6 +334,22 @@ Registry.register({
             and type(measured.checks) == 'number'
             and measured.checks >= ClientConfig.nuiDevtools.progressEvery
             and measured.checks < ClientConfig.nuiDevtools.confirmChecks
+    end,
+})
+
+Registry.register({
+    key = 'movement.server_speed',
+    category = 'movement',
+    version = 1,
+    defaultSeverity = 100,
+    defaultConfidence = 0.90,
+    cooldownMs = 5000,
+    strikeWindowMs = 60000,
+    strikeDecayMs = 30000,
+    cancellable = false,
+    validate = function(measured)
+        return type(measured.speed) == 'number' and type(measured.limit) == 'number'
+            and measured.speed > measured.limit
     end,
 })
 

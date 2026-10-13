@@ -10,6 +10,8 @@ CreateThread(function()
         return
     end
 
+    require('server-lua.install').run()
+
     local ok, migrationVersion = xpcall(Migrations.run, debug.traceback)
     if not ok then
         Logger.structured('error', 'migration_failed', { error = migrationVersion })
@@ -21,9 +23,11 @@ CreateThread(function()
     require('server-lua.detection.profile').start()
     require('server-lua.detection.exceptions').reload()
     require('server-lua.services.sessions').start()
+    require('server-lua.protections.permits').start()
     require('server-lua.protections.network').start()
     require('server-lua.protections.combat').start()
     require('server-lua.protections.vehicle').start()
+    require('server-lua.protections.movement').start()
     require('server-lua.integrity.heartbeat').start()
     require('server-lua.enforcement.bans').start()
     require('server-lua.enforcement.cleanup').start()
